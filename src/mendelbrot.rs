@@ -1,6 +1,7 @@
 use image::{ImageBuffer, Luma};
 use num::complex::Complex;
 
+#[allow(dead_code)]
 pub fn render() -> ImageBuffer<Luma<u8>, Vec<u8>> {
     let max_iterations = 256u16;
     let x_pixels = 1000;
