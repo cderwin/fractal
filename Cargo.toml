@@ -6,6 +6,7 @@ authors = ["Cameron Derwin <camderwin@gmail.com>"]
 [dependencies]
 argparse = "*"
 image = "*"
+iron = "*"
 num = "0.1"
 
 [lib]
