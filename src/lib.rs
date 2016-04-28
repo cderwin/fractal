@@ -1,4 +1,4 @@
 extern crate image;
 extern crate num;
 
-mod mendelbrot;
+mod mandelbrot;
