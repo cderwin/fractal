@@ -4,6 +4,6 @@ version = "0.1.0"
 authors = ["Cameron Derwin <camderwin@gmail.com>"]
 
 [dependencies]
-argparse = "*"
+docopt = "0.7"
 image = "*"
 num = "0.1"

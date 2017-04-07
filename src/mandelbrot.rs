@@ -1,26 +1,41 @@
 use image::{ImageBuffer, Luma};
 use num::complex::Complex;
 
-#[allow(dead_code)]
-pub fn render() -> ImageBuffer<Luma<u8>, Vec<u8>> {
-    let max_iterations = 256u16;
+#[derive(Debug)]
+pub struct Bounds {
+    min: Complex<f64>,
+    max: Complex<f64>
+}
+
+impl Bounds {
+    pub fn new(min: Complex<f64>, max: Complex<f64>) -> Bounds {
+        Bounds { min: min, max: max }
+    }
+
+    pub fn re_min(&self) -> f64 { self.min.re }
+    pub fn re_max(&self) -> f64 { self.max.re }
+    pub fn im_min(&self) -> f64 { self.min.im }
+    pub fn im_max(&self) -> f64 { self.max.im }
+}
+
+pub fn render(bounds: Bounds, max_iter: u32) -> ImageBuffer<Luma<u8>, Vec<u8>> {
     let x_pixels = 1000;
     let y_pixels = 1000;
 
     let mut img = ImageBuffer::new(x_pixels, y_pixels);
 
-    let x_scale = 4.0 / x_pixels as f32;
-    let y_scale = 4.0 / y_pixels as f32;
+    let x_scale = (bounds.re_max() - bounds.re_min()) / x_pixels as f64;
+    let y_scale = (bounds.im_max() - bounds.im_min()) / y_pixels as f64;
 
     for (x, y, pixel) in img.enumerate_pixels_mut() {
-        let x_coord = x as f32 * x_scale - 2.0;
-        let y_coord = y as f32 * y_scale - 2.0;
+        let x_coord = bounds.re_min() + (x as f64) * x_scale;
+        let y_coord = bounds.im_min() + (y as f64) * y_scale;
 
         let c = Complex::new(x_coord, y_coord);
         let mut z = Complex::new(0.0, 0.0);
         let mut i = 0;
 
-        for _ in 0..max_iterations {
+        for _ in 0..max_iter {
             if z.norm() > 2.0 { break; }
             z = z * z + c;
             i += 1;
