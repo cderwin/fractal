@@ -1,4 +1,4 @@
-#![feature(plugin)]
+#![feature(plugin, custom_derive)]
 #![plugin(rocket_codegen)]
 
 extern crate docopt;
@@ -8,19 +8,18 @@ extern crate rocket;
 
 mod error;
 mod mandelbrot;
+mod routes;
 
 use docopt::Docopt;
-use image::ImageLuma8;
+use image::ImageRgb8;
 use num::Complex;
-use rocket::response::{Response, NamedFile};
-use rocket::http::ContentType;
 
 use std::fs::File;
-use std::io;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use error::Result;
-use mandelbrot::Bounds;
+use mandelbrot::{Bounds, Gradient};
+use routes::RenderOptions;
 
 const USAGE: &'static str = "
 mandelbrot: fun with fractals
@@ -41,7 +40,7 @@ fn main() {
 
     if argv_map.get_bool("render") {
         let fname = argv_map.get_str("<file>");
-        render(fname).unwrap();
+        render_to_file(fname).unwrap();
     }
 
     if argv_map.get_bool("serve") {
@@ -49,39 +48,17 @@ fn main() {
     }
 }
 
-#[get("/render/<z>/<y>/<x>")]
-fn render_route<'a>(x: i32, y: i32, z: i32) -> Result<Response<'a>> {
-    let bounds = Bounds::from_crs(x, y, z);
-    let img = mandelbrot::render(bounds, 128);
-    let mut buffer = io::Cursor::new(Vec::new());
-    let image = ImageLuma8(img);
-    image.save(&mut buffer, image::PNG)?;
 
-    Ok(Response::build()
-        .header(ContentType::PNG)
-        .sized_body(buffer)
-        .finalize())
-}
-
-
-fn render(fname: &str) -> Result<()> {
+fn render_to_file(fname: &str) -> Result<()> {
     let bounds = Bounds::new(Complex::new(-2.0, -2.0), Complex::new(2.0, 2.0));
-    let img = mandelbrot::render(bounds, 128);
+    let gradient = Gradient::new(RenderOptions::to_color(0xf9690e), RenderOptions::to_color(0x1f3a93));
+    let img = mandelbrot::render(bounds, gradient, 128);
     let ref mut fout = File::create(&Path::new(fname))?;
-    ImageLuma8(img).save(fout, image::PNG)?;
+    ImageRgb8(img).save(fout, image::PNG)?;
     Ok(())
 }
 
-#[get("/static/<path..>", rank=5)]
-fn static_files(path: PathBuf) -> io::Result<NamedFile> {
-    NamedFile::open(Path::new("static/").join(path))
-}
-
-#[get("/")]
-fn index() -> io::Result<NamedFile> {
-    NamedFile::open("static/index.html")
-}
 
 fn serve() {
-    rocket::ignite().mount("/", routes![index, static_files, render_route]).launch();
+    rocket::ignite().mount("/", routes![routes::index, routes::static_files, routes::render]).launch();
 }

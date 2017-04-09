@@ -1,4 +1,4 @@
-use image::{ImageBuffer, Luma};
+use image::{ImageBuffer, Rgb, Pixel};
 use num::complex::Complex;
 
 #[derive(Debug)]
@@ -25,31 +25,55 @@ impl Bounds {
     pub fn im_max(&self) -> f64 { self.max.im }
 }
 
-pub fn render(bounds: Bounds, max_iter: u32) -> ImageBuffer<Luma<u8>, Vec<u8>> {
-    let x_pixels = 256;
-    let y_pixels = 256;
-
+pub fn render(bounds: Bounds, gradient: Gradient, max_iter: u32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let (x_pixels, y_pixels) = (256, 256);
     let mut img = ImageBuffer::new(x_pixels, y_pixels);
 
-    let x_scale = (bounds.re_max() - bounds.re_min()) / x_pixels as f64;
-    let y_scale = (bounds.im_max() - bounds.im_min()) / y_pixels as f64;
+    let x_scale = (bounds.re_max() - bounds.re_min()) / (x_pixels as f64);
+    let y_scale = (bounds.im_max() - bounds.im_min()) / (y_pixels as f64);
 
     for (x, y, pixel) in img.enumerate_pixels_mut() {
         let x_coord = bounds.re_min() + (x as f64) * x_scale;
         let y_coord = bounds.im_min() + (y as f64) * y_scale;
 
         let c = Complex::new(x_coord, y_coord);
-        let mut z = Complex::new(0.0, 0.0);
-        let mut i = 0;
+        let mut z = c;
+        let mut i = 1;
 
         for _ in 0..max_iter {
-            if z.norm() > 2.0 { break; }
+            if z.norm_sqr() > 4.0 { break; }
             z = z * z + c;
             i += 1;
         }
 
-        *pixel = Luma([i as u8]);
+        *pixel = gradient.value((i as f64)/(max_iter as f64));
     }
 
     img
+}
+
+#[derive(Debug)]
+pub struct Gradient {
+    min: Rgb<u8>,
+    max: Rgb<u8>,
+}
+
+impl Gradient {
+    pub fn new(min: Rgb<u8>, max: Rgb<u8>) -> Gradient {
+        Gradient {
+            min: min,
+            max: max,
+        }
+    }
+
+    fn value(&self, value: f64) -> Rgb<u8> {
+        let min_channels = self.min.channels();
+        let max_channels = self.max.channels();
+
+        let red   = ((1.0 - value) * (min_channels[0] as f64) + value * (max_channels[0] as f64)) as u8;
+        let green = ((1.0 - value) * (min_channels[1] as f64) + value * (max_channels[1] as f64)) as u8;
+        let blue  = ((1.0 - value) * (min_channels[2] as f64) + value * (max_channels[2] as f64)) as u8;
+
+        Rgb([red, green, blue])
+    }
 }
