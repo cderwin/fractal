@@ -12,6 +12,13 @@ impl Bounds {
         Bounds { min: min, max: max }
     }
 
+    pub fn from_crs(x: i32, y: i32, z: i32) -> Bounds {
+        let increment = 4.0_f64 * 2.0_f64.powi(-z);
+        let min = Complex::new(-2.0 + (x as f64) * increment, -2.0 + (y as f64) * increment);
+        let max = Complex::new(-2.0 + ((x + 1) as f64) * increment, -2.0 + ((y + 1) as f64) * increment);
+        Bounds::new(min, max)
+    }
+
     pub fn re_min(&self) -> f64 { self.min.re }
     pub fn re_max(&self) -> f64 { self.max.re }
     pub fn im_min(&self) -> f64 { self.min.im }
@@ -19,8 +26,8 @@ impl Bounds {
 }
 
 pub fn render(bounds: Bounds, max_iter: u32) -> ImageBuffer<Luma<u8>, Vec<u8>> {
-    let x_pixels = 1000;
-    let y_pixels = 1000;
+    let x_pixels = 256;
+    let y_pixels = 256;
 
     let mut img = ImageBuffer::new(x_pixels, y_pixels);
 
