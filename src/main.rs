@@ -12,7 +12,6 @@ mod routes;
 
 use docopt::Docopt;
 use image::ImageRgb8;
-use num::Complex;
 
 use std::fs::File;
 use std::path::Path;
@@ -25,11 +24,17 @@ const USAGE: &'static str = "
 mandelbrot: fun with fractals
 
 Usage:
-  mandelbrot render <file>
+  mandelbrot render [options] <file>
   mandelbrot serve
   mandelbrot help
 
-Arguments:
+Options:
+  --r-min     Minimum real value of plot (Default: -2.0)
+  --r-max     Maximum real value of plot (Default: 2.0)
+  --i-min     Minimum imaginary value of plot (Default: -2.0)
+  --i-max     Maximum imaginary value of plot (Default: 2.0)
+  --max-iter  Maximum number of iterations for each point (Default: 1024)
+  --constant  Constant parameter for plot.  (Default: 2)
   -h, --help  Print this usage
 ";
 
@@ -50,7 +55,7 @@ fn main() {
 
 
 fn render_to_file(fname: &str) -> Result<()> {
-    let bounds = Bounds::new(Complex::new(-2.0, -2.0), Complex::new(2.0, 2.0));
+    let bounds = Bounds::from_floats(-2.0, -2.0, 2.0, 2.0);
     let gradient = Gradient::new(RenderOptions::to_color(0xf9690e), RenderOptions::to_color(0x1f3a93));
     let img = mandelbrot::render(bounds, gradient, 128);
     let ref mut fout = File::create(&Path::new(fname))?;

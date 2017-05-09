@@ -1,9 +1,9 @@
 window.onload = function(){
 
-var map = L.map('map').setView([0.00, 0.00], 0);
+window.map = L.map('map').setView([0.00, 0.00], 0);
 
-L.tileLayer(window.location + 'render/{z}/{y}/{x}?', {
+L.tileLayer(window.location + 'render/{z}/{y}/{x}?max_iter=1024', {
     'maxZoom': 1000
-}).addTo(map);
+}).addTo(window.map);
 
 };
