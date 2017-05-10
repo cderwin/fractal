@@ -51,12 +51,8 @@ impl RenderOptions {
 }
 
 
-#[get("/render/<z_str>/<y_str>/<x_str>?<options>")]
-pub fn render<'a>(x_str: &str, y_str: &str, z_str: &str, options: RenderOptions) -> Result<Response<'a>> {
-    let x = BigInt::from_str(x_str)?;
-    let y =BigInt::from_str(y_str)?;
-    let z = BigInt::from_str(z_str)?;
-
+#[get("/render/<z>/<y>/<x>?<options>")]
+pub fn render<'a>(x: u64, y: u64, z: u64, options: RenderOptions) -> Result<Response<'a>> {
     let bounds = Bounds::from_crs(x, y, z)?;
     let img = mandelbrot::render(bounds, options.gradient(), options.max_iter());
     let mut buffer = io::Cursor::new(Vec::new());
