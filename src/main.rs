@@ -15,10 +15,15 @@ use image::ImageRgb8;
 
 use std::fs::File;
 use std::path::Path;
+use std::process;
 
 use error::Result;
 use mandelbrot::{Bounds, Gradient};
 use routes::RenderOptions;
+
+extern "C" {
+    fn signal(sig: u32, callback: extern fn(u32)) -> fn(u32);
+}
 
 const USAGE: &'static str = "
 mandelbrot: fun with fractals
@@ -40,6 +45,11 @@ Options:
 
 
 fn main() {
+    // Setup sigterm handling
+    unsafe {
+        signal(2, handle_sigterm);
+    }
+
     let docopt = Docopt::new(USAGE).unwrap_or_else(|e| e.exit());
     let argv_map = docopt.parse().unwrap_or_else(|e| e.exit());
 
@@ -51,6 +61,11 @@ fn main() {
     if argv_map.get_bool("serve") {
         serve();
     }
+}
+
+
+extern fn handle_sigterm(_: u32) {
+    process::exit(0);
 }
 
 
