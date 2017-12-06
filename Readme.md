@@ -3,7 +3,7 @@ Mandelbrot
 
 A lightweight microservice that allows you to explore the mandelbrot set google maps style!
 
-# Dependencies
+## Dependencies
 
 To build and run the project locally as it's currently set up, you need the following: 
 
@@ -12,7 +12,7 @@ To build and run the project locally as it's currently set up, you need the foll
 * docker-compose
 * and make
 
-# Running
+## Running
 
 Running is simple: just `make run`, or even ust `make`.
 This command will:
@@ -24,7 +24,7 @@ This command will:
 To stop the process, `^C` will work fine.
 If you just want to build the container, try `make build`.
 
-# Feedback and Bugs
+## Feedback and Bugs
 
 If you have any comments or would like to contribute, please feel free to submit an issue.
 I'm not actively developing this but there are a couple of improvements I have in mind that I might someday get to.
@@ -33,7 +33,7 @@ Currently if you zoom in far enough, things start to get blurry.
 Unfortunately higher precision floating point arithmetic currently seems to be too slow or too immature in Rust.
 There are potential algorithmic solutions, but I haven't had the time to expore them fully.
 
-# License
+## License
 
 ```
 The MIT License (MIT)
