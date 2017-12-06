@@ -42,8 +42,16 @@ impl Bounds {
 
         // x * incr, y * incr
         // (x + 1) * incr, (y + 1) * incr
-        let min = Complex::new((x as f64) * increment + X_OFFSET, (y as f64) * increment + Y_OFFSET);
-        let max = Complex::new(((x + 1) as f64) * increment + X_OFFSET, ((y + 1) as f64) * increment + Y_OFFSET);
+        let min = Complex::new(
+            (x as f64) * increment + X_OFFSET,
+            (y as f64) * increment + Y_OFFSET
+        );
+
+        let max = Complex::new(
+            ((x + 1) as f64) * increment + X_OFFSET,
+            ((y + 1) as f64) * increment + Y_OFFSET
+        );
+
         Ok(Bounds::new(min, max))
     }
 

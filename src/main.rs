@@ -80,5 +80,8 @@ fn render_to_file(fname: &str) -> Result<()> {
 
 
 fn serve() {
-    rocket::ignite().mount("/", routes![routes::index, routes::static_files, routes::render]).launch();
+    rocket::ignite().mount(
+        "/",
+        routes![routes::index, routes::static_files, routes::render]
+    ).launch();
 }
