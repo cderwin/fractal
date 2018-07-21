@@ -1,37 +1,45 @@
 Mandelbrot
 =======
 
-A lightweight microservice that allows you to explore the mandelbrot set google maps style!
+A lightweight microservice that allows you to explore the mandelbrot fractal google maps-style!
 
 ## Dependencies
 
-To build and run the project locally as it's currently set up, you need the following: 
+The main build artifact of this project is a web server (a binary) inside an alpine container.  
+Because alpine uses musl, we need to cross compile for `x86_64-unknown-linux-musl`.
 
-* a relatively recent rust compiler with cargo (anything in the last year or two *should* work)
-* docker
-* docker-compose
-* and make
+Cross compiling is complicated.  
+It can be hard to set up and works differently in different operating systems.  
+We make it easy with docker: the only dependency is a working docker and make.
 
 ## Running
 
-Running is simple: just `make run`, or even ust `make`.
+Running is simple: just `make run`, or just `make`.
 This command will:
 
-1. compile the program (with `cargo build --release`, otherwise it's unbearably slow)
-2. build the docker container
-3. start the docker container and attach it to your tty
+1. build the container in which we will cross-compile the executable
+1. cross-compile the binary in the aforementioned container
+2. build the alpine container
+3. run the alpine container and attach it to your tty
 
+The server will run at localhost:8000.
 To stop the process, `^C` will work fine.
 If you just want to build the container, try `make build`.
 
+**NOTE**: compilation will start a docker container, but not end it.
+This way cargo won't have to re-download sources for all the cargo dependencies every time we compile.
+The ownside is that the build container, named `mandelbrot-build`, will be left running after compilation.
+When you're done working on the project, you can run `docker stop mandelbrot-build` to stop and remove the container.
+
 ## Feedback and Bugs
 
-If you have any comments or would like to contribute, please feel free to submit an issue.
-I'm not actively developing this but there are a couple of improvements I have in mind that I might someday get to.
+If you have any comments or would like to contribute, please submit an issue.
+I'm not actively developing this but there are a couple of improvements I have in mind that I might get to soon.
 
 Currently if you zoom in far enough, things start to get blurry.
-Unfortunately higher precision floating point arithmetic currently seems to be too slow or too immature in Rust.
+Unfortunately higher precision floating point arithmetic currently seems to be too slow.
 There are potential algorithmic solutions, but I haven't had the time to expore them fully.
+If you have any ideas I'd love to hear them.
 
 ## License
 
