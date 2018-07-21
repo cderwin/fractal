@@ -1,30 +1,37 @@
 sudo: required
 
 services:
-    - docker
+  - docker
 
+addons:
+  apt:
+    update: true
+    packages:
+      - docker-ce
 
 before_install:
-    - docker build -t mandelbrot-build -f BuildDockerfile .
-    - docker run -d --rm -v $(pwd):/mandelbrot -t --name mandelbrot-build mandelbrot-build bash
+  - docker --version
+  - docker build -t mandelbrot-build -f BuildDockerfile .
+  - docker run -d --rm -v $(pwd):/mandelbrot -t --name mandelbrot-build mandelbrot-build bash
+  - docker ps -a
 
 install:
-    - docker exec -w /mandelbrot mandelbrot-build /root/.cargo/bin/cargo build --release --target=x86_64-unknown-linux-musl
+  - docker exec -w /mandelbrot mandelbrot-build /root/.cargo/bin/cargo build --release --target=x86_64-unknown-linux-musl
 
 script:
-    - docker exec -w /mandelbrot mandelbrot-build /root/.cargo/bin/cargo test
+  - docker exec -w /mandelbrot mandelbrot-build /root/.cargo/bin/cargo test
 
 after_script:
-    - docker rm -f mandelbrot-build
+  - docker rm -f mandelbrot-build
 
 before_deploy:
-    - docker build -t cderwin/mandelbrot .
-    - docker tag cderwin/mandelbrot cderwin/mandelbrot:$(git rev-parse HEAD)
-    - docker tag cderwin/mandelbrot cderwin/mandelbrot:latest
+  - docker build -t cderwin/mandelbrot .
+  - docker tag cderwin/mandelbrot cderwin/mandelbrot:$(git rev-parse HEAD)
+  - docker tag cderwin/mandelbrot cderwin/mandelbrot:latest
 
 deploy:
-    provider: script
-    scipt: bash deploy.sh
-    skip_cleanup: true
-    on:
-        branch: master
+  provider: script
+  scipt: bash deploy.sh
+  skip_cleanup: true
+  on:
+    branch: master
