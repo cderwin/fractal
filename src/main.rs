@@ -73,8 +73,8 @@ fn render_to_file(fname: &str) -> Result<()> {
     let bounds = Bounds::from_floats(-2.0, -2.0, 2.0, 2.0);
     let gradient = Gradient::new(RenderOptions::to_color(0xf9690e), RenderOptions::to_color(0x1f3a93));
     let img = mandelbrot::render(bounds, gradient, 128);
-    let ref mut fout = File::create(&Path::new(fname))?;
-    ImageRgb8(img).save(fout, image::PNG)?;
+    let ref fout = &Path::new(fname);
+    ImageRgb8(img).save(fout)?;
     Ok(())
 }
 

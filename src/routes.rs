@@ -56,7 +56,7 @@ pub fn render<'a>(x: u64, y: u64, z: u64, options: RenderOptions) -> Result<Resp
     let bounds = Bounds::from_crs(x, y, z)?;
     let img = mandelbrot::render(bounds, options.gradient(), options.max_iter());
     let mut buffer = io::Cursor::new(Vec::new());
-    ImageRgb8(img).save(&mut buffer, image::PNG)?;
+    ImageRgb8(img).write_to(&mut buffer, image::PNG)?;
 
     Ok(Response::build()
         .header(ContentType::PNG)

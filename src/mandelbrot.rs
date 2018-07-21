@@ -28,10 +28,6 @@ impl Bounds {
     }
 
     pub fn from_crs(x: u64, y: u64, z: u64) -> Result<Bounds> {
-        if z < 0 {
-            return Err(Error::NegativeZoom)
-        }
-
         let mut ctr = z;
         let scaling_factor = 0.5 as f64;
         let mut increment = 4.0 as f64;
