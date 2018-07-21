@@ -20,12 +20,12 @@ install:
 
 script:
   - docker exec -w /mandelbrot mandelbrot-build /root/.cargo/bin/cargo test
+  - docker build -t cderwin/mandelbrot .
 
 after_script:
   - docker rm -f mandelbrot-build
 
 before_deploy:
-  - docker build -t cderwin/mandelbrot .
   - docker tag cderwin/mandelbrot cderwin/mandelbrot:$(git rev-parse HEAD)
   - docker tag cderwin/mandelbrot cderwin/mandelbrot:latest
 
