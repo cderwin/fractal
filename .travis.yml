@@ -20,7 +20,8 @@ install:
 
 script:
   - docker exec -w /mandelbrot mandelbrot-build /root/.cargo/bin/cargo test
-  - docker build -t cderwin/mandelbrot .
+  - ls -al target/debug/incremental/
+  - docker build -t cderwin/mandelbrot -f Dockerfile .
 
 after_script:
   - docker rm -f mandelbrot-build
