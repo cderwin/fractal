@@ -18,7 +18,7 @@ image := $(registry)/$(project):$(tag)
 		touch $@
 
 $(executable): $(src) Cargo.toml Cargo.lock .ts.buildcontainer
-	if [ ! $$(docker ps -q -f "name=$(buld_container_name)") ]; then \
+	if [ ! "$$(docker ps -q -f "name=$(build_container_name)")" ]; then \
 		docker run --rm -ti -d \
 			--name $(build_container_name) \
 			-v $$(pwd):/mandelbrot \
@@ -34,7 +34,7 @@ $(executable): $(src) Cargo.toml Cargo.lock .ts.buildcontainer
 	docker build -t $(image_name) . && \
 		touch $@
 
-.PHONY: run sh build deploy end
+.PHONY: run sh build deploy end clean
 
 run: .ts.container
 	docker run --rm \
@@ -64,3 +64,6 @@ build: .ts.container
 deploy: $(executable)
 	docker build . -t $(image)  && \
 	docker push $(image)
+
+clean:
+	rm .ts.*
