@@ -9,52 +9,87 @@ use error::{Error, Result};
 const X_OFFSET: f64 = -2.0;
 const Y_OFFSET: f64 = -2.0;
 
+
 #[derive(Debug)]
-pub struct Bounds {
+pub struct Tile {
     min: Complex<f64>,
     max: Complex<f64>
 }
 
 
-impl Bounds {
-    pub fn new(min: Complex<f64>, max: Complex<f64>) -> Bounds {
-        Bounds { min: min, max: max }
+impl Tile {
+    /// Returns a tile into the complex plane
+    ///
+    /// # Arguments:
+    ///
+    /// * `min` - A complex float that represents the lower left corner of the tile
+    /// * `max` - a complex float that represent the upper right corner of the tile
+    pub fn new(min: Complex<f64>, max: Complex<f64>) -> Tile {
+        Tile { min: min, max: max }
     }
 
-    pub fn from_floats(re_min: f64, im_min: f64, re_max: f64, im_max: f64) -> Bounds {
-        let min = Complex::new(re_min, im_min);
-        let max = Complex::new(re_max, im_max);
-        Bounds::new(min, max)
+    /// Returns a tile for x, y coordinate bounds
+    ///
+    /// # Arguments:
+    ///
+    /// * `x_min` - float representing the left boundary of the tile
+    /// * `y_min` - float representing the bottom boundary of the tile
+    /// * `x_max` - float representing the right boundary of the tile
+    /// * `y_max` - float representing the top boundary of the tile
+    pub fn from_bounds(x_min: f64, y_min: f64, x_max: f64, y_max: f64) -> Tile {
+        let min = Complex::new(x_min, y_min);
+        let max = Complex::new(x_max, y_max);
+        Tile::new(min, max)
     }
 
-    pub fn from_crs(x: u64, y: u64, z: u64) -> Result<Bounds> {
-        let mut ctr = z;
-        let scaling_factor = 0.5 as f64;
-        let mut increment = 4.0 as f64;
-        while ctr > 0 {
-            increment = increment * scaling_factor;
-            ctr = ctr - 1;
-        }
+    /// Returns a tile from tms coordinates.  Global tms coordinates 0/0/0 corresponds to (-2-2i,
+    /// 2+2i).
+    ///
+    /// # Arguments:
+    ///
+    /// * `x` - x coordinate of tile at given zoom level
+    /// * `y` - y coordiate of tile at given zoom level.  Note: by universal convention this is
+    /// taken to be the negative of the y value in the tms spec.
+    /// * `z` - the zoom level of the tile
+    pub fn from_tms(x: u64, y: u64, z: u64) -> Tile {
+        // tile size is 4.0 * 2 ** -z == 0.5 ** (z - 2)
+        let tile_size: f64 = if (z >= 2) { 0.5.powi(z - 2) } else { 2.0.powi(2 - z) }
 
-        // x * incr, y * incr
-        // (x + 1) * incr, (y + 1) * incr
-        let min = Complex::new(
-            (x as f64) * increment + X_OFFSET,
-            (y as f64) * increment + Y_OFFSET
-        );
-
-        let max = Complex::new(
-            ((x + 1) as f64) * increment + X_OFFSET,
-            ((y + 1) as f64) * increment + Y_OFFSET
-        );
-
-        Ok(Bounds::new(min, max))
+        // x_min = X_OFFSET + tile_size * x
+        // y_min = Y_OFFSET + tile_size * y
+        let x_min = X_OFFSET + tile_size * (x as f64);
+        let y_min = Y_OFFSET + tile_size * (y as f64);
+        Tile::from_bounds(x_min, y_min, x_min + tile_size, y_min + tile_size)
     }
 
-    pub fn re_min(&self) -> f64 { self.min.re }
-    pub fn re_max(&self) -> f64 { self.max.re }
-    pub fn im_min(&self) -> f64 { self.min.im }
-    pub fn im_max(&self) -> f64 { self.max.im }
+    /// Returns (x_min, y_min, x_max, y_max) bounds of a tile
+    ///
+    /// # Arguments:
+    /// * `&self` - tile whose bounds are returned
+    pub fn bounds(&self) -> (f64, f64, f64, f64) { (self.min.re, self.min.im, self.max.re, self.max.im) }
+
+    /// Returns the children of a tile at the next zoom level
+    ///
+    /// # Arguments:
+    /// * `&self` - tile whose children will be returned
+    pub fn children(&self, zoom: ) -> (Tile, Tile, Tile, Tile) {
+    }
+
+    /// Returns the parent of this tile at the previous zoom level
+    ///
+    /// # Arguments:
+    /// * `&self` - tile whose parent will be returned
+    pub fn parent(&self, zoom: ) -> Tile {
+    }
+
+    pub fn to_array(&self, resolution: usize, buffer: mut& [f32]) -> {
+    }
+
+    pub fn to_ndarray(&self, resolution: usize, buffer: mut& [f32]) -> {
+    }
+
+    pub fn to_image_buffer(&self, resolution: usize, buffer: mut& ImageBuffer) -> {
+    }
 }
 
 

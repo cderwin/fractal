@@ -45,7 +45,7 @@ Options:
 
 
 fn main() {
-    // Setup sigterm handling
+    // Register sigterm handler in order to handle ctrl-C correctly
     unsafe {
         signal(2, handle_sigterm);
     }
